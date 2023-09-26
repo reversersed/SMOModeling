@@ -6,19 +6,21 @@ namespace SMOModeling
 {
     public partial class MainForm : Form
     {
+        const int ArrivingInterval = 2000; // Interval of clients arriving
+
         Queue<Client>[] queue = new Queue<Client>[2] { new Queue<Client>(), new Queue<Client>() };
         System.Windows.Forms.Timer ArrivalTimer = new System.Windows.Forms.Timer();
 
         short clientNumbers = 10;
         Random r = new Random();
 
-        Thread[] ThreadCashier;
         Cashier[] Cashiers = new Cashier[2] { new Cashier(0), new Cashier(1) };
+        Thread[] ThreadCashier;
         public MainForm()
         {
             InitializeComponent();
 
-            ArrivalTimer.Interval = 1000;
+            ArrivalTimer.Interval = ArrivingInterval;
             ArrivalTimer.Tick += ClientArrived;
 
             Cashiers[0].onClientManaged += OnClientManaged;

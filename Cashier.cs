@@ -11,13 +11,14 @@ namespace SMOModeling
     {
         public clientManaged onClientManaged;
         private int cashierId;
-        public Cashier(int  cashierId) 
+        private Random r = new Random();
+        public Cashier(int cashierId) 
         {
             this.cashierId = cashierId;
         }
         public void CashierManaging(object? client)
         {
-            Thread.Sleep(5000);
+            Thread.Sleep(r.Next(3000, 8000));
             onClientManaged?.Invoke((Client)client, cashierId);
         }
     }
