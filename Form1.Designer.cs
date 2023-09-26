@@ -41,6 +41,7 @@
             StartButton.TabIndex = 0;
             StartButton.Text = "Начать моделирование";
             StartButton.UseVisualStyleBackColor = true;
+            StartButton.Click += SMOStarted;
             // 
             // WaitingLabel
             // 
@@ -73,12 +74,14 @@
             Controls.Add(DoneLabel);
             Controls.Add(WaitingLabel);
             Controls.Add(StartButton);
+            DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             Name = "MainForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Система массового обслуживания";
+            Paint += MainForm_Paint;
             ResumeLayout(false);
             PerformLayout();
         }
