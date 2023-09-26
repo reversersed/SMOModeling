@@ -28,13 +28,51 @@
         /// </summary>
         private void InitializeComponent()
         {
+            StartButton = new Button();
+            WaitingLabel = new Label();
+            DoneLabel = new Label();
             SuspendLayout();
+            // 
+            // StartButton
+            // 
+            StartButton.Location = new Point(12, 12);
+            StartButton.Name = "StartButton";
+            StartButton.Size = new Size(138, 46);
+            StartButton.TabIndex = 0;
+            StartButton.Text = "Начать моделирование";
+            StartButton.UseVisualStyleBackColor = true;
+            // 
+            // WaitingLabel
+            // 
+            WaitingLabel.AutoSize = true;
+            WaitingLabel.Font = new Font("Verdana", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            WaitingLabel.ForeColor = SystemColors.ButtonFace;
+            WaitingLabel.Location = new Point(181, 33);
+            WaitingLabel.Name = "WaitingLabel";
+            WaitingLabel.Size = new Size(199, 18);
+            WaitingLabel.TabIndex = 1;
+            WaitingLabel.Text = "Ждут обслуживания:";
+            // 
+            // DoneLabel
+            // 
+            DoneLabel.AutoSize = true;
+            DoneLabel.Font = new Font("Verdana", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            DoneLabel.ForeColor = SystemColors.ButtonFace;
+            DoneLabel.Location = new Point(517, 33);
+            DoneLabel.Name = "DoneLabel";
+            DoneLabel.Size = new Size(168, 18);
+            DoneLabel.TabIndex = 2;
+            DoneLabel.Text = "Готовы к выдаче:";
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ControlDarkDark;
             ClientSize = new Size(784, 861);
+            Controls.Add(DoneLabel);
+            Controls.Add(WaitingLabel);
+            Controls.Add(StartButton);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             Name = "MainForm";
@@ -42,8 +80,13 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Система массового обслуживания";
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
+
+        private Button StartButton;
+        private Label WaitingLabel;
+        private Label DoneLabel;
     }
 }
