@@ -11,12 +11,22 @@ namespace SMOModeling
 
         short clientNumbers = 10;
         Random r = new Random();
+
+        Thread[] ThreadCashier;
+        Cashier[] Cashiers = new Cashier[2] { new Cashier(0), new Cashier(1) };
         public MainForm()
         {
             InitializeComponent();
 
-            ArrivalTimer.Interval = 2000;
+            ArrivalTimer.Interval = 1000;
             ArrivalTimer.Tick += ClientArrived;
+
+            Cashiers[0].onClientManaged += OnClientManaged;
+            Cashiers[1].onClientManaged += OnClientManaged;
+
+            DoneLabel.Text = "Готовы к выдаче:\n\n";
+
+            ThreadCashier = new Thread[2] { new Thread(new ParameterizedThreadStart(Cashiers[0].CashierManaging)), new Thread(new ParameterizedThreadStart(Cashiers[1].CashierManaging)) };
         }
 
         private void ClientArrived(object? sender, EventArgs e)
@@ -26,7 +36,11 @@ namespace SMOModeling
 
             string[] names = new string[] { "Евгений", "Павел", "Владислав", "Владлен", "Сергей", "Дарья", "Ксения", "Роман", "Степан", "Аркадий", "Геннадий", "Максим", "Наташа", "Светлана", "Мария", "Антон", "Андрей", "Василиса", "Георгий" };
 
-            queue.MinBy(q => q.Count).Enqueue(new Client(names[r.Next(names.Length)]));
+            queue?.MinBy(q => q.Count)?.Enqueue(new Client(names[r.Next(names.Length)]));
+
+            for(int i = 0; i < 2; i++)
+                if (queue[i].Count > 0 && ThreadCashier[i].ThreadState == ThreadState.Unstarted)
+                    ThreadCashier[i].Start(queue[i].Dequeue());
             this.Invalidate();
         }
 
@@ -35,10 +49,19 @@ namespace SMOModeling
             ArrivalTimer.Start();
         }
 
+        private void OnClientManaged(Client client, int cashierid)
+        {
+            ThreadCashier[cashierid] = new Thread(new ParameterizedThreadStart(Cashiers[cashierid].CashierManaging));
+            if (queue[cashierid].Count > 0)
+                ThreadCashier[cashierid].Start(queue[cashierid].Dequeue());
+
+            DoneLabel.Invoke(new Action(() => DoneLabel.Text += client.name+"\n"));
+            this.Invalidate();
+        }
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
             WaitingLabel.Text = "Ждут обслуживания:\n\n";
-            foreach (Client c in queue[0]?.ToArray())
+            foreach (Client c in queue[0].ToArray())
                 WaitingLabel.Text += c.name + "\n";
             foreach (Client c in queue[1].ToArray())
                 WaitingLabel.Text += c.name + "\n";
