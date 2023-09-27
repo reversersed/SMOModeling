@@ -6,20 +6,16 @@ using System.Threading.Tasks;
 
 namespace SMOModeling
 {
-    public delegate void clientManaged(Client client, int cashier);
+    public delegate void clientManaged(Client client);
     public class Cashier
     {
-        public clientManaged onClientManaged;
-        private int cashierId;
+        public clientManaged onClientManaged = null;
         private Random r = new Random();
-        public Cashier(int cashierId) 
+
+        public void CashierManaging(object client)
         {
-            this.cashierId = cashierId;
-        }
-        public void CashierManaging(object? client)
-        {
-            Thread.Sleep(r.Next(3000, 8000));
-            onClientManaged?.Invoke((Client)client, cashierId);
+            Thread.Sleep(r.Next(2000, 5000));
+            onClientManaged?.Invoke((Client)client);
         }
     }
 }

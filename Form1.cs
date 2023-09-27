@@ -6,16 +6,16 @@ namespace SMOModeling
 {
     public partial class MainForm : Form
     {
-        const int ArrivingInterval = 2000; // Interval of clients arriving
+        const int ArrivingInterval = 1000; // Interval of clients arriving
 
-        Queue<Client>[] queue = new Queue<Client>[2] { new Queue<Client>(), new Queue<Client>() };
+        Queue<Client> queue = new Queue<Client>();
         System.Windows.Forms.Timer ArrivalTimer = new System.Windows.Forms.Timer();
 
         short clientNumbers = 10;
         Random r = new Random();
 
-        Cashier[] Cashiers = new Cashier[2] { new Cashier(0), new Cashier(1) };
-        Thread[] ThreadCashier;
+        Cashier Cashier = new Cashier();
+        Thread ThreadCashier;
         public MainForm()
         {
             InitializeComponent();
@@ -23,12 +23,11 @@ namespace SMOModeling
             ArrivalTimer.Interval = ArrivingInterval;
             ArrivalTimer.Tick += ClientArrived;
 
-            Cashiers[0].onClientManaged += OnClientManaged;
-            Cashiers[1].onClientManaged += OnClientManaged;
+            Cashier.onClientManaged += OnClientManaged;
 
             DoneLabel.Text = "Готовы к выдаче:\n\n";
 
-            ThreadCashier = new Thread[2] { new Thread(new ParameterizedThreadStart(Cashiers[0].CashierManaging)), new Thread(new ParameterizedThreadStart(Cashiers[1].CashierManaging)) };
+            ThreadCashier = new Thread(new ParameterizedThreadStart(Cashier.CashierManaging));
         }
 
         private void ClientArrived(object? sender, EventArgs e)
@@ -37,12 +36,10 @@ namespace SMOModeling
                 ArrivalTimer.Stop();
 
             string[] names = new string[] { "Евгений", "Павел", "Владислав", "Владлен", "Сергей", "Дарья", "Ксения", "Роман", "Степан", "Аркадий", "Геннадий", "Максим", "Наташа", "Светлана", "Мария", "Антон", "Андрей", "Василиса", "Георгий" };
+            queue.Enqueue(new Client(names[r.Next(names.Length)]));
 
-            queue?.MinBy(q => q.Count)?.Enqueue(new Client(names[r.Next(names.Length)]));
-
-            for(int i = 0; i < 2; i++)
-                if (queue[i].Count > 0 && ThreadCashier[i].ThreadState == ThreadState.Unstarted)
-                    ThreadCashier[i].Start(queue[i].Dequeue());
+            if (queue.Count > 0 && ThreadCashier.ThreadState == ThreadState.Unstarted)
+                ThreadCashier.Start(queue.Dequeue());
             this.Invalidate();
         }
 
@@ -51,21 +48,19 @@ namespace SMOModeling
             ArrivalTimer.Start();
         }
 
-        private void OnClientManaged(Client client, int cashierid)
+        private void OnClientManaged(Client client)
         {
-            ThreadCashier[cashierid] = new Thread(new ParameterizedThreadStart(Cashiers[cashierid].CashierManaging));
-            if (queue[cashierid].Count > 0)
-                ThreadCashier[cashierid].Start(queue[cashierid].Dequeue());
+            ThreadCashier = new Thread(new ParameterizedThreadStart(Cashier.CashierManaging));
+            if (queue.Count > 0)
+                ThreadCashier.Start(queue.Dequeue());
 
-            DoneLabel.Invoke(new Action(() => DoneLabel.Text += client.name+"\n"));
+            DoneLabel.Invoke(new Action(() => DoneLabel.Text += client.name + "\n"));
             this.Invalidate();
         }
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
             WaitingLabel.Text = "Ждут обслуживания:\n\n";
-            foreach (Client c in queue[0].ToArray())
-                WaitingLabel.Text += c.name + "\n";
-            foreach (Client c in queue[1].ToArray())
+            foreach (Client c in queue.ToArray())
                 WaitingLabel.Text += c.name + "\n";
         }
     }
